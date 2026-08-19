@@ -1,23 +1,28 @@
 import random
-rand = random.randint(1, 10)
+rand = int(random.randint(1, 10))
 guesscnt = 0
-wincon = False
-usrguess = ""
+usrguess = 0
+test = False
 
 def guess():
-    usrguess = int(input("give a random number as a guess "))
-    processguess()
+    try:
+        usrguess = int(input("give a random number as a guess "))
+    except:
+        print("give an actual number please !")
+        guess()
+    test = usrguess == rand
+    # print(f"rand: {rand} = {usrguess} is {test}")
+    processguess(usrguess)
 
-def processguess():
+def processguess(usrg):
     global guesscnt
-    if usrguess == rand:  
+    if (usrg == rand):  
         print("congrats !!")
         print(guesscnt)
+        exit
     else:
         guesscnt += 1
         print(f"you lost {guesscnt} times !!")
-        print(guesscnt)
         guess()
 
 guess()
-# while wincon == False:
