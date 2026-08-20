@@ -1,6 +1,6 @@
-l = 13.3
-p = 32*l
-t = 20*p
+l = 13.3 #lot
+p = 32*l #pound
+t = 20*p #talent
 def GetValues():
     unit = None 
     value = None
