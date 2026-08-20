@@ -1,3 +1,0 @@
-name = input("Enter your name: ")
-age = input("...and your age? ")
-print(f"Hello {name}, age {age} !") # space is intentional i just like how it looks !
