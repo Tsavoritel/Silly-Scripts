@@ -25,7 +25,7 @@ def guess():
 def processguess(usrg):
     global guesscnt
     guesscnt += 1
-    if (usrg == rand):  
+    if (usrg == rand):
         print(f"Got it !! You guessed {guesscnt} time(s) !!")
         exit
     else:
