@@ -1,6 +1,20 @@
 import random
 randmin = 1
-randmax = 50
+randmax = None
+randmaxe = 10 #easy
+randmaxh = 50 #hard
+
+print("Welcome to RNG-ame")
+mode = input("Would you like to play on easy or hard? (e/h): ")
+if mode == "h":
+    randmax = randmaxh
+elif mode == "e":
+    randmax = randmaxe
+else:
+    print("Invalid gamemode, defaulting to easy...")
+    randmax = randmaxe
+
+
 rand = int(random.randint(randmin, randmax))
 
 hd = 3 #"hot delta" or how far away should the program consider a number to be close
@@ -13,14 +27,18 @@ guesscnt = 0
 usrguess = 0
 
 print(f"A random number was generated ({randmin}-{randmax})")
+print("Options: integer (for guess), or q to quit")
 
 def guess():
-    try:
-        usrguess = int(input("Input your guess: "))
-    except:
-        print("Give an actual number please !")
+    global usrguess
+    usrguess = input("Input: ")
+    if usrguess == int:
+        processguess(usrguess)
+    elif usrguess == "q":
+        exit
+    else:
+        print("Invalid input !")
         guess()
-    processguess(usrguess)
 
 def processguess(usrg):
     global guesscnt
