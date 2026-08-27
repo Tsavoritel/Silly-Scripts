@@ -8,7 +8,7 @@ c = 0 # counter
 
 while (c < maxn):
     px = random.random() #points in unknown square
-    py = random.random()#1, maxh)
+    py = random.random()
     c += 1
     if math.pow(px, 2)+math.pow(py, 2) < 1: #is it in the circle also?
         n += 1
