@@ -12,7 +12,7 @@ while (c < maxn):
     c += 1
     if math.pow(px, 2)+math.pow(py, 2) < 1: #is it in the circle also?
         n += 1
-    if c % (maxn / 100) == 0:
+    if c % (maxn / 100) == 0 or c == 0:
         percent = (c / maxn) * 100
         print(f"Loading: {round(percent)}%")
 
