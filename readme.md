@@ -1,6 +1,5 @@
 Name: Elise Collins
 
-I also have one or two personal projects in here please lemme know if that should be separate
-
 Course progression:
-I've completed Mod01-Mod05 and Project 1
+Completed: Mod01-Mod05 and Project2
+Working on: Mod06
