@@ -1,6 +1,0 @@
-#mod01 excercise1, mod02 excercise2, and project 1
-name = input("Enter your name: ")
-age = input("...and your age? ")
-print(f"Hello {name}, age {age} !") # space is intentional i just like how it looks !
-#I combined both module 1 and project 1 here because they basically accomplish...
-#...the same thing, but please let me know if that is not acceptable.
