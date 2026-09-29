@@ -5,6 +5,8 @@ from typing import Union
 usrname = input("Enter your name: ")
 usrSelection = ""
 items = []
+dungeoned = False
+fighting = False
 
 #age check
 
@@ -80,12 +82,54 @@ def CheckInventory():
     print(items)
 def PlayerInfo():
     print(f"You are {usrname} and are {age} years old.")
+def DisplayOptions():
+    optionsList = []
+    if (dungeoned == False):
+        optionsList.append("e: enter dungeon")
+    else:
+        optionsList.append("<: walk left")
+        optionsList.append(">: walk right")
+    if (fighting == True):
+        optionsList.append("a: attack enemy")
+    optionsList.append("i: inventory")
+    optionsList.append("p: playerinfo")
+    optionsList.append("x: exit game")
+    print(f"options: {optionsList}")
+    usrSelection = input("Input: ")
+    match usrSelection:
+        case "e":
+            print("Which dungeon would you like to explore ?")
+            print(f"Options: 1: {dungeons[0].name}, 2: {dungeons[1].name}, 3: {dungeons[2].name}")
+            i = input("Input: ")
+            if not(i in ("1", "2", "3")):
+                print("Invalid option")
+                DisplayOptions()
+            print(f"Entering {dungeons[int(i)-1].name} ....")
+            dungeoned == True
+        case "i":
+            CheckInventory()
+        case "p":
+            PlayerInfo()
+        case "<":
+            print("Walked one space left")
+        case ">":
+            print("Walked one space right")
+        case "x":
+            print("Exiting...")
+        case _:
+            print("Invalid option, please choose from the following list")
+            DisplayOptions()
 
 # objects
 enemies = []
-enemies.append(Slime = Enemy("slime", 1, 0, 1))
-enemies.append(Skeleton = Enemy("skeleton", 1.5, 1, 1))
-enemies.append(Ghost = Enemy("ghost", 2, 2, 2))
+enemies.append(Enemy("slime", 1, 0, 1))
+enemies.append(Enemy("skeleton", 1.5, 1, 1))
+enemies.append(Enemy("ghost", 2, 2, 2))
+
+dungeons: list[Dungeon] = []
+dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1))
+dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 1.5))
+dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 2))
 
 # main program (Start Game !)
 
@@ -93,23 +137,6 @@ print(f"Hello {usrname}, age {age} !")
 print("You find yourself in a mysterious world of Goo, surrounded by vast fields and forests, you wander around in awe")
 print("Along your travels, you notice entrences embedded in the ground, unsaitiably curious, you feel compelled to walk in")
 print("However, this isnt the first one you've seen, not even the second, but the third !")
-print("Which dungeon shall you delve ..?")
+print("In this world, the choice is yours, what is it you'd like to do?")
 
-dungeoned == False
-fighting == False
-optionsList = []
-
-while usrSelection != "exit":
-    print("Options: gotitem, inventory, whoami, exit")
-    usrSelection = input("Input: ")
-    match usrSelection:
-        case "gotitem":
-            ItemAdder(input("What item did you pickup? "))
-        case "inventory":
-            CheckInventory()
-        case "whoami":
-            PlayerInfo()
-        case "exit":
-            print("Exiting...")
-        case _:
-            print("Invalid option, please choose from the following list")
+DisplayOptions()
