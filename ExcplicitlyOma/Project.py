@@ -1,15 +1,14 @@
 #mod01 excercise1, mod02 excercise2, and project 1-3
 import random
 from typing import Union
+import time
 
 usrname = input("Enter your name: ")
 usrSelection = ""
 items = []
 dungeoned = False
-fighting = False
 
-#age check
-
+# Age Check
 try:
     age = int(input("...and your age? "))
 except:
@@ -20,32 +19,6 @@ if age < 13:
     exit
 
 # Main Setup
-# Places
-class Dungeon():
-    def __init__(self, name, floors, damageMod):
-        self.name = name
-        self.floors = floors
-        self.damageMod = damageMod
-class Hallway():
-    def __init__(self, tiles, maxEnemies):
-        self.tiles = tiles
-        self.maxEnemies = maxEnemies
-    def BuildHallway(self):
-        self.tiles = []
-        self.maxEnemies = self.tiles - 2
-        self.tiles.append(Tile(Staircase(EmptyTile)))
-        for i in random.randrange(2, 10):
-            i += 1
-            if (random.randrange(1, 10) > 7): # Should u spawn an enemy
-                enemyToSpawn: Enemy = enemies[random.randrange(1, enemies.count + 1)] # Which one
-                self.tiles.append(Tile(enemyToSpawn))
-            else:
-                self.tiles.append(Tile(EmptyTile))
-        self.tiles.append(Tile(Staircase(True)))
-class Tile():
-    def __init__(self, occupency: Union[Player, Enemy, Staircase, EmptyTile]):
-        self.occupency = occupency
-
 # Entities
 class Staircase():
     def __init__(self, down: bool):
@@ -76,6 +49,44 @@ class EmptyTile():
     def __init__(self):
         self.display = "-"
 
+# Places
+class Tile():
+    def __init__(self, occupency: Union[Player, Enemy, Staircase, EmptyTile]):
+        self.occupency = occupency
+class Hallway():
+    def __init__(self):
+        self.tiles: list[Tile]
+        self.maxEnemies: int
+        self.tilesDisplay: list[str] = []
+    def BuildHallway(self):
+        self.tiles = []
+        self.maxEnemies = len(self.tiles) - 2
+        self.tiles.append(Tile(Staircase(False)))
+        self.tilesDisplay.append("↑")
+        self.tilesDisplay.append(Tile(Staircase.display)) # this wants to be an object, do you need a class?
+        for i in random.randrange(2, 10):
+            if (random.randrange(1, 10) > 7): # Should u spawn an enemy
+                enemyToSpawn: Enemy = enemies[random.randrange(1, len(enemies) + 1)] # Which one
+                self.tiles.append(Tile(enemyToSpawn))
+                self.tilesDisplay.append(Tile(enemyToSpawn.display))
+            else:
+                self.tiles.append(Tile(EmptyTile))
+                self.tilesDisplay.append(Tile(EmptyTile.display))
+        self.tiles.append(Tile(Staircase(True)))
+        self.tilesDisplay.append(Tile(Staircase.display))
+        self.tilesDisplay.append("↓")
+class Dungeon():
+    def __init__(self, name, maxFloors, damageMod):
+        self.name = name
+        self.maxFloors: int = maxFloors
+        self.damageMod = damageMod
+        self.floors: list[Hallway] = []
+    def BuildDungeon(self):
+        for hall in range(self.maxFloors):
+            hall = Hallway()
+            self.floors.append(hall.BuildHallway())
+
+
 def ItemAdder(item):
     items.append(item)
 def CheckInventory():
@@ -84,13 +95,14 @@ def PlayerInfo():
     print(f"You are {usrname} and are {age} years old.")
 def DisplayOptions():
     optionsList = []
+    curDungeon: int
+    global dungeoned
     if (dungeoned == False):
         optionsList.append("e: enter dungeon")
     else:
+        print()
         optionsList.append("<: walk left")
         optionsList.append(">: walk right")
-    if (fighting == True):
-        optionsList.append("a: attack enemy")
     optionsList.append("i: inventory")
     optionsList.append("p: playerinfo")
     optionsList.append("x: exit game")
@@ -100,12 +112,21 @@ def DisplayOptions():
         case "e":
             print("Which dungeon would you like to explore ?")
             print(f"Options: 1: {dungeons[0].name}, 2: {dungeons[1].name}, 3: {dungeons[2].name}")
-            i = input("Input: ")
-            if not(i in ("1", "2", "3")):
+            try: 
+                curDungeon = int(input("Input: "))
+            except: 
                 print("Invalid option")
                 DisplayOptions()
-            print(f"Entering {dungeons[int(i)-1].name} ....")
-            dungeoned == True
+            if not(curDungeon in (1, 2, 3)):
+                print("Invalid option")
+                DisplayOptions()
+            curDungeon -= 1
+            print(f"Entering {dungeons[curDungeon].name} ....")
+            dungeons[curDungeon].BuildDungeon()
+            time.sleep(2)
+            print(dungeons[curDungeon].floors[0].tilesDisplay)
+            dungeoned = True
+            DisplayOptions()
         case "i":
             CheckInventory()
         case "p":
