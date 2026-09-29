@@ -25,8 +25,6 @@ class Race:
         for Car in self.cars:
             Car.Accelerate(random.randrange(-10, 15))
             Car.Drive()
-        if(self.race_finished != True):
-            self.race_finished()
     def print_status(self):
         everyCarsInfo = []
         for Car in self.cars:
