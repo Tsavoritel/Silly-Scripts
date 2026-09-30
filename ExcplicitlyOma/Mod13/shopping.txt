@@ -1,0 +1,4 @@
+milk
+bread
+eggs
+apples

@@ -20,9 +20,10 @@ if age < 13:
 
 # Main Setup
 # Entities
-class Staircase():
-    def __init__(self, down: bool):
-        self.display = "="
+class SpecialTile():
+    def __init__(self, display, isStaircase: bool, down: bool = False):
+        self.display = display
+        self.isStaircase = isStaircase
         self.down = down
 class Player():
     def __init__(self, name, level, hp, spd, evasionchance):
@@ -50,30 +51,29 @@ class EmptyTile():
         self.display = "-"
 
 # Places
-class Tile():
-    def __init__(self, occupency: Union[Player, Enemy, Staircase, EmptyTile]):
-        self.occupency = occupency
+#class Tile():
+#    def __init__(self, occupency: Union[Player, Enemy, SpecialTile, EmptyTile]):
+#        self.occupency = occupency
 class Hallway():
     def __init__(self):
-        self.tiles: list[Tile]
+        self.tiles: list = []
         self.maxEnemies: int
         self.tilesDisplay: list[str] = []
     def BuildHallway(self):
-        self.tiles = []
         self.maxEnemies = len(self.tiles) - 2
-        self.tiles.append(Tile(Staircase(False)))
+        self.tiles.append(SpecialTile(True, False))
         self.tilesDisplay.append("↑")
-        self.tilesDisplay.append(Tile(Staircase.display)) # this wants to be an object, do you need a class?
-        for i in random.randrange(2, 10):
+        self.tilesDisplay.append(specialTiles[0].display) # this wants to be an object, do you need a class?
+        for i in range(random.randrange(2, 10)):
             if (random.randrange(1, 10) > 7): # Should u spawn an enemy
-                enemyToSpawn: Enemy = enemies[random.randrange(1, len(enemies) + 1)] # Which one
-                self.tiles.append(Tile(enemyToSpawn))
-                self.tilesDisplay.append(Tile(enemyToSpawn.display))
+                enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
+                self.tiles.append(enemyToSpawn)
+                self.tilesDisplay.append(enemyToSpawn.display)
             else:
-                self.tiles.append(Tile(EmptyTile))
-                self.tilesDisplay.append(Tile(EmptyTile.display))
-        self.tiles.append(Tile(Staircase(True)))
-        self.tilesDisplay.append(Tile(Staircase.display))
+                self.tiles.append(EmptyTile)
+                self.tilesDisplay.append(specialTiles[2].display)
+        self.tiles.append(SpecialTile(True, True))
+        self.tilesDisplay.append(specialTiles[1].display)
         self.tilesDisplay.append("↓")
 class Dungeon():
     def __init__(self, name, maxFloors, damageMod):
@@ -82,9 +82,13 @@ class Dungeon():
         self.damageMod = damageMod
         self.floors: list[Hallway] = []
     def BuildDungeon(self):
+        i = 0
         for hall in range(self.maxFloors):
             hall = Hallway()
-            self.floors.append(hall.BuildHallway())
+            hall.BuildHallway()
+            self.floors.append(hall)
+            print(f"Bult hallway: {i}: {hall.tilesDisplay}")
+            i += 1
 
 
 def ItemAdder(item):
@@ -96,6 +100,7 @@ def PlayerInfo():
 def DisplayOptions():
     optionsList = []
     curDungeon: int
+    curFloor: int = 0
     global dungeoned
     if (dungeoned == False):
         optionsList.append("e: enter dungeon")
@@ -112,9 +117,9 @@ def DisplayOptions():
         case "e":
             print("Which dungeon would you like to explore ?")
             print(f"Options: 1: {dungeons[0].name}, 2: {dungeons[1].name}, 3: {dungeons[2].name}")
-            try: 
+            try:
                 curDungeon = int(input("Input: "))
-            except: 
+            except:
                 print("Invalid option")
                 DisplayOptions()
             if not(curDungeon in (1, 2, 3)):
@@ -123,8 +128,9 @@ def DisplayOptions():
             curDungeon -= 1
             print(f"Entering {dungeons[curDungeon].name} ....")
             dungeons[curDungeon].BuildDungeon()
-            time.sleep(2)
-            print(dungeons[curDungeon].floors[0].tilesDisplay)
+            time.sleep(1)
+            print(f"Currently in: {dungeons[curDungeon].name}.. On floor {curFloor}")
+            print(dungeons[curDungeon].floors[curFloor].tilesDisplay)
             dungeoned = True
             DisplayOptions()
         case "i":
@@ -151,6 +157,11 @@ dungeons: list[Dungeon] = []
 dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1))
 dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 1.5))
 dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 2))
+
+specialTiles: list[SpecialTile] = []
+specialTiles.append(SpecialTile("=", True, False))
+specialTiles.append(SpecialTile("=", True, True))
+specialTiles.append(SpecialTile("-", False))
 
 # main program (Start Game !)
 
