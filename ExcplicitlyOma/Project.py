@@ -149,7 +149,22 @@ def DisplayOptions():
         case "p":
             PlayerInfo()
         case "<":
-            print("Walked one space left")
+            if dungeons[curDungeon].floors[curFloor].tiles[curTile - 1] == specialTiles[2]:
+                print("Walked one space left")
+                curTile += 1
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
+                curTile -= 2
+                print(f"Current Tile: {curTile}")
+            else: #has to be staircase up
+                print("Returning to last floor...")
+                try:
+                    dungeons[curDungeon].floors[curFloor - 1]
+                except:
+                    print("you exited the dungeon") # maybe generate the amount based on how many tiles you passed
+                    curFloor -= 1
+                    curTile = len(dungeons[curDungeon].floors[curFloor].tiles) - 1
+            DisplayOptions()
         case ">":
             if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
                 print("Attacked an enemy !!")
@@ -161,11 +176,12 @@ def DisplayOptions():
                 print(f"Current Tile: {curTile}")
             else: #has to be staircase down
                 print("Entering next floor...")
-                if (dungeons[curDungeon].floors[curFloor + 1] == None):
+                try:
+                    dungeons[curDungeon].floors[curFloor + 1]
+                except:
                     print("you get the rock food !!") # maybe generate the amount based on how many tiles you passed
-                else:
-                    curFloor += 1
-                    curTile = 1
+                curFloor += 1
+                curTile = 1
             DisplayOptions()
 
         case "x":
