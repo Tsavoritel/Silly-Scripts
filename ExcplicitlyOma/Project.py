@@ -53,9 +53,6 @@ class Item():
         self.display = "$"
         self.name = name
         self.atk = atk
-class EmptyTile(): # depricated
-    def __init__(self):
-        self.display = "-"
 
 # Places
 #class Tile():
@@ -99,13 +96,15 @@ class Dungeon():
             #print(f"Bult hallway: {i}: {hall.tilesDisplay}") # tis for debugging
             i += 1
 
-
 def ItemAdder(item):
     items.append(item)
 def CheckInventory():
     print(items)
+    DisplayOptions()
 def PlayerInfo():
-    print(f"You are {usrname} and are {age} years old.")
+    print(f"{player.name}'s stats:")
+    print(f"Hp: {player.hp}, Lv: {player.level}, Sp: {player.spd}")
+    DisplayOptions()
 def DisplayOptions():
     optionsList = []
     global dungeoned
@@ -157,17 +156,20 @@ def DisplayOptions():
                 curTile -= 2
                 print(f"Current Tile: {curTile}")
             else: #has to be staircase up
-                print("Returning to last floor...")
-                try:
-                    dungeons[curDungeon].floors[curFloor - 1]
-                except:
-                    print("you exited the dungeon") # maybe generate the amount based on how many tiles you passed
+                if (curFloor - 1 >= 0):
                     curFloor -= 1
+                    curTile -= 1
+                    print("Returning to last floor...")
                     curTile = len(dungeons[curDungeon].floors[curFloor].tiles) - 1
+                else:
+                    print("you exited the dungeon") # maybe generate the amount based on how many tiles you passed
+                    dungeoned = False
             DisplayOptions()
         case ">":
             if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
-                print("Attacked an enemy !!")
+                #would like to enable the option to check enemy stats
+                enemy = dungeons[curDungeon].floors[curFloor].tiles[curTile+1].name
+                print(f"Attacked an {enemy} !!")
             elif dungeons[curDungeon].floors[curFloor].tiles[curTile+1] == specialTiles[2]:
                 print("Walked one space right")
                 curTile += 1
@@ -180,6 +182,7 @@ def DisplayOptions():
                     dungeons[curDungeon].floors[curFloor + 1]
                 except:
                     print("you get the rock food !!") # maybe generate the amount based on how many tiles you passed
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile + 1] = specialTiles[2].display
                 curFloor += 1
                 curTile = 1
             DisplayOptions()
@@ -208,12 +211,16 @@ specialTiles.append(SpecialTile("-", False))
 
 player = Player(usrname, 0, 5, 1, 0)
 
-# main program (Start Game !)
+# main program, Start Game !
 
 print(f"Hello {usrname}, age {age} !")
-print("You find yourself in a mysterious world of Goo, surrounded by vast fields and forests, you wander around in awe")
-print("Along your travels, you notice entrences embedded in the ground, unsaitiably curious, you feel compelled to walk in")
+print("You find yourself in a mysterious world of Goo")
+print("Surrounded by vast fields and forests, remembering you were entrusted to save the village")
+print("Along your travels, you notice entrences embedded in the ground, unsaitiably curious, you are compelled inward")
 print("However, this isnt the first one you've seen, not even the second, but the third !")
 print("In this world, the choice is yours, what is it you'd like to do?")
 
 DisplayOptions()
+
+# pieces of lore handed to you throughout the game
+#print("Awhile ago, the village faced tragidy with a flood that completely destroyed all sources of food and farm land")
