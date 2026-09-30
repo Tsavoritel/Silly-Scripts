@@ -147,9 +147,12 @@ class Hallway():
         self.tilesDisplay.append(specialTiles[0].display)
         self.tiles.append(specialTiles[2]) # always make an empty space for player to spawn on
         self.tilesDisplay.append(specialTiles[2].display)
+
         for i in range(random.randrange(2, self.maxTiles)):
-            if (random.randrange(1, 10) > 7): # Spawn an enemy ?
-                enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
+            if (random.randrange(1, 10) > 6): # Spawn an enemy ?
+                if curDungeon != 3:
+                    enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
+                else: enemyToSpawn = villager
                 enemyToSpawn.hp *= dmgMod
                 self.tiles.append(enemyToSpawn)
                 self.tilesDisplay.append(enemyToSpawn.display)
@@ -369,6 +372,7 @@ enemies = []
 enemies.append(Enemy("slime", 1, 0, 1, 1))
 enemies.append(Enemy("skeleton", 1.5, 1, 1, 2))
 enemies.append(Enemy("ghost", 2, 2, 2, 5))
+villager = (Enemy("villager", 3, 3, 3, 10))
 
 dungeons: list[Dungeon] = []
 dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1, 8))
