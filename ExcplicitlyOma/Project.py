@@ -50,7 +50,7 @@ class Player():
         self.heldRockmeal = heldRockmeal
     def PlayerInfo(self):
         print(f"{self.name}'s stats:")
-        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/30), At: {player.atk}, Sp: {player.spd}")
+        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/20), At: {self.atk}, Sp: {self.spd}, Hr: {self.heldRockmeal}")
     def LevelUp(self):
         print("You leveled up !!")
         self.atk += 0.5
@@ -78,8 +78,10 @@ class Item():
 class Village():
     def __init__(self, fednessLvl):
         self.fednessLvl = fednessLvl
-        self.nextMileStone = 149
+        self.nextMileStone = 119
     def CheckDialogue(self):
+        global curDungeon
+        global inDungeon
         self.fednessLvl += player.heldRockmeal
         if self.fednessLvl > self.nextMileStone:
             self.fednessLvl = self.nextMileStone
@@ -87,32 +89,40 @@ class Village():
         if self.fednessLvl <= 100:
             print('"Awhile ago, the village was faced with tragidy..\n' \
             'There was a flood that destroyed all of our sources of food and farm land"')
+            self.nextMileStone = 120
+        elif self.fednessLvl <= 120:
+            print('"Oh my, is that food?? Bless you, you might have staved over our hunger for now.."')
             self.nextMileStone = 150
         elif self.fednessLvl <= 150:
-            print('"Oh my, is that food?? Bless you, you might have staved over our hunger for now.."')
+            print('"I know it might feel wrong taking this food, but it is for the best."')
             self.nextMileStone = 200
         elif self.fednessLvl <= 200:
-            print('"I know it might feel wrong taking this food, but it is for the best."')
-            self.nextMileStone = 250
-        elif self.fednessLvl <= 250:
             print('"I have heard other townspeople complain about the dungeon raids as well...\n' \
             'The truth is, rockmeal is a neverending resource, but they choose to keep it all for themselves."')
             self.nextMileStone = 300
         elif self.fednessLvl <= 300:
             pass
-            self.nextMileStone = 350
-        elif self.fednessLvl <= 350:
+            self.nextMileStone = 455
+        elif self.fednessLvl <= 455:
             print('"Hahahaha !! We have too much food !! I believe our village is saved !!\n' \
             '..you... must have killed so many..."')
-            self.nextMileStone = 400
-        elif self.fednessLvl <= 400:
-            print('"Ha..hah.. thats even more ! what could we possibly do with all of this food..?"')
-            self.nextMileStone = 450
-        elif self.fednessLvl <= 450:
+            self.nextMileStone = 600
+        elif self.fednessLvl <= 600:
+            print('"Ha..hah.. thats even more ! What could we.. possibly.. do with all of this food..?"')
+            self.nextMileStone = 1000
+        elif self.fednessLvl < 1000:
             print('"Why do you keep pillaging... we have enough, theres no need for any more..."')
-        if self.fednessLvl < 250:
+            self.nextMileStone = 1500
+        elif self.fednessLvl == 1500:
+            curDungeon = 3
+            print(f"Entering {dungeons[curDungeon].name} ....")
+            dungeons[curDungeon].BuildDungeon()
+            time.sleep(1)
+            inDungeon = True
+            DisplayOptions()
+        if self.fednessLvl < 300:
             print('"We have nothing else for you now, besides healing, please do your best"')
-        else:
+        elif self.fednessLvl < 1500:
             print('"Take all the food you need, we have plenty now"')
         player.hp = player.maxHp
         print("You feel rested..")
@@ -270,12 +280,12 @@ def MoveRight():
             for i in range(len(dungeons[curDungeon].floors)):
                 foundRockmeal += len(dungeons[curDungeon].floors[i].tiles)
             if curDungeon == 0:
-                foundRockmeal /= 2
+                foundRockmeal //= 2
             elif curDungeon == 2:
                 foundRockmeal *= 2
             print(f"You pickup {foundRockmeal} pieces !!")
             if player.heldRockmeal > 0:
-                player.heldRockmeal *= 1.1
+                player.heldRockmeal = round(player.heldRockmeal * 1.1, None)
                 print("Something lucky happened because you were risky !!")
             player.heldRockmeal += foundRockmeal
             curTile = 1
@@ -346,7 +356,7 @@ def EnemyDied():
     global curTile
     global curEnemy
     player.xp += curEnemy.xp
-    if player.xp >= 30:
+    if player.xp >= 20:
         player.LevelUp()
     print(f"You beat the {curEnemy.name} and gained {curEnemy.xp}xp !!")
     curEnemy = None
@@ -362,8 +372,9 @@ enemies.append(Enemy("ghost", 2, 2, 2, 5))
 
 dungeons: list[Dungeon] = []
 dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1, 8))
-dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 1.5,  12))
-dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 3, 16))
+dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 3,  12))
+dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 8, 16))
+dungeons.append(Dungeon("...Village.. what are you doing??", 10, 20, 32))
 
 specialTiles: list[SpecialTile] = []
 specialTiles.append(SpecialTile("=", True, False))
@@ -374,9 +385,13 @@ player = Player(usrname, 1, 0, 5, 5, 1, 1, 1)
 curEnemy: Enemy = None
 village = Village(100)
 
-# main program, Start Game !
+# main program, Start Game !rest
 
 print(f"Hello {usrname}, age {age} !")
+if age > 120: 
+    time.sleep(1)
+    print("Wow.. you're *really* old !")
+    time.sleep(1)
 print("You find yourself in a mysterious world of Goo")
 print("Surrounded by vast fields and forests, remembering you were entrusted to save the village")
 print("Along your travels, you notice entrences embedded in the ground, unsaitiably curious, you are compelled inward")
