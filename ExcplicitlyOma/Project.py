@@ -36,28 +36,36 @@ class SpecialTile():
         self.isStaircase = isStaircase
         self.down = down
 class Player():
-    def __init__(self, name, level, hp, spd, atk, evasionchance):
+    def __init__(self, name, level, xp, hp, maxHp, spd, atk, evasionchance):
         self.display = "☺︎"
         self.inventory = []
         self.name = name
         self.level = level
+        self.xp = xp
         self.hp = hp
+        self.maxHp = maxHp
         self.spd = spd
         self.atk = atk
         self.evasionchance = evasionchance
+    def PlayerInfo(self):
+        print(f"{self.name}'s stats:")
+        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/30), Sp: {player.spd}")
 class Enemy():
-    def __init__(self, name, hp, atk, spd):
+    def __init__(self, name, hp, atk, spd, xp):
         self.display = "%"
         self.name = name
         self.hp = hp
         self.atk = atk
         self.spd = spd
+        self.xp = xp
+    def EnemyInfo(self):
+        print(f"{self.name}'s stats:")
+        print(f"Hp: {self.hp}")
 class Item():
     def __init__(self, name, atk):
         self.display = "$"
         self.name = name
         self.atk = atk
-
 # Places
 #class Tile():
 #    def __init__(self, occupency: Union[Player, Enemy, SpecialTile, EmptyTile]):
@@ -112,13 +120,6 @@ def ItemAdder(item):
 def CheckInventory():
     print(items)
     DisplayOptions()
-def PlayerInfo():
-    print(f"{player.name}'s stats:")
-    print(f"Hp: {player.hp}, Lv: {player.level}, Sp: {player.spd}")
-    DisplayOptions()
-def EnemyInfo():
-    print(f"{curEnemy.name}'s stats:")
-    print(f"Hp: {curEnemy.hp}")
 def DisplayOptions():
     optionsList = []
     global inDungeon
@@ -162,12 +163,13 @@ def DisplayOptions():
                 inDungeon = True
                 DisplayOptions()
             elif curEnemy != None:
-                EnemyInfo()
+                curEnemy.EnemyInfo()
                 DisplayOptions()
         case "i":
             CheckInventory()
         case "p":
-            PlayerInfo()
+            player.PlayerInfo()
+            DisplayOptions()
         case "<":
             if inDungeon:
                 MoveLeft()
@@ -176,10 +178,12 @@ def DisplayOptions():
                 MoveRight()
         case "x":
             print("Exiting...")
+            quit()
         case _:
             pass
     print("Invalid option, please choose from the following list")
     DisplayOptions()
+
 def MoveRight():
     global inDungeon
     global curDungeon
@@ -189,32 +193,8 @@ def MoveRight():
 
     # Fight enemy if its in front of you
     if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
-        
         curEnemy = dungeons[curDungeon].floors[curFloor].tiles[curTile+1]
-        #if curEnemy.hp > 0:
-        
-        if curEnemy.spd > player.spd and curEnemy.hp > 0 and player.hp > 0:
-            player.hp -= curEnemy.atk
-            print(f"Attacked by a {curEnemy.name} !!")
-            curEnemy.hp -= player.atk
-            print(f"Attacked a {curEnemy.name} !!")
-        elif curEnemy.hp > 0 and player.hp > 0:
-            curEnemy.hp -= player.atk
-            print(f"Attacked a {curEnemy.name} !!")
-            if curEnemy.hp > 0:
-                player.hp -= curEnemy.atk
-                print(f"Attacked by a {curEnemy.name} !!")
-        elif player.hp > 0:
-            print(f"You beat the {curEnemy.name} !!")
-            curEnemy = None
-            dungeons[curDungeon].floors[curFloor].tiles[curTile+1] = specialTiles[2]
-            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+2] = specialTiles[2].display
-            DisplayOptions()
-        else:
-            print("You died...")
-            print(f"Got carried away and lost FOOD_AMOUNT_HERE...")
-            inDungeon = False
-            DisplayOptions()
+        FightEnemy()
 
     # Move forward if nothing is in front of you
     elif dungeons[curDungeon].floors[curFloor].tiles[curTile+1] == specialTiles[2]:
@@ -263,11 +243,56 @@ def MoveLeft():
             inDungeon = False
     DisplayOptions()
 
+def FightEnemy():
+    global curEnemy
+    global inDungeon
+    if curEnemy.spd > player.spd and curEnemy.hp > 0 and player.hp > 0:
+        if(random.randrange(1, 100) > player.evasionchance):
+            player.hp -= curEnemy.atk
+            print(f"Attacked by a {curEnemy.name} !!")
+        else: print(f"You dodged {curEnemy.name}'s attack !!")
+        curEnemy.hp -= player.atk
+        print(f"Attacked a {curEnemy.name} !!")
+    elif curEnemy.hp > 0 and player.hp > 0:
+        curEnemy.hp -= player.atk
+        print(f"Attacked a {curEnemy.name} !!")
+        if curEnemy.hp > 0:
+            player.hp -= curEnemy.atk
+            print(f"Attacked by a {curEnemy.name} !!")
+        else:
+            EnemyDied()
+    elif player.hp > 0:
+        EnemyDied()
+    if player.hp <= 0: 
+        print("You died...")
+        print(f"Got carried away and lost FOOD_AMOUNT_HERE...")
+        inDungeon = False
+        DisplayOptions()
+
+def EnemyDied():
+    global curDungeon
+    global curFloor
+    global curTile
+    global curEnemy
+    player.xp += curEnemy.xp
+    if player.xp >= 30:
+        print("You leveled up !!")
+        player.atk += 0.5
+        player.spd += 0.5
+        player.evasionchance += 2
+        player.maxHp += 2
+        player.xp = 0
+    print(f"You beat the {curEnemy.name} and gained {curEnemy.xp}xp !!")
+    curEnemy = None
+    dungeons[curDungeon].floors[curFloor].tiles[curTile+1] = specialTiles[2]
+    dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+2] = specialTiles[2].display
+    DisplayOptions()
+
 # objects
 enemies = []
-enemies.append(Enemy("slime", 1, 0, 1))
-enemies.append(Enemy("skeleton", 1.5, 1, 1))
-enemies.append(Enemy("ghost", 2, 2, 2))
+enemies.append(Enemy("slime", 1, 0, 1, 1))
+enemies.append(Enemy("skeleton", 1.5, 1, 1, 2))
+enemies.append(Enemy("ghost", 2, 2, 2, 5))
 
 dungeons: list[Dungeon] = []
 dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1, 8))
@@ -279,7 +304,7 @@ specialTiles.append(SpecialTile("=", True, False))
 specialTiles.append(SpecialTile("=", True, True))
 specialTiles.append(SpecialTile("-", False))
 
-player = Player(usrname, 0, 5, 1, 1, 1.1)
+player = Player(usrname, 0, 0, 5, 5, 1, 1, 1)
 curEnemy: Enemy = None
 
 # main program, Start Game !
