@@ -36,7 +36,7 @@ class SpecialTile():
         self.isStaircase = isStaircase
         self.down = down
 class Player():
-    def __init__(self, name, level, xp, hp, maxHp, spd, atk, evasionchance):
+    def __init__(self, name, level, xp, hp, maxHp, spd, atk, evasionchance, heldRockmeal = 0):
         self.display = "☺︎"
         self.inventory = []
         self.name = name
@@ -47,9 +47,18 @@ class Player():
         self.spd = spd
         self.atk = atk
         self.evasionchance = evasionchance
+        self.heldRockmeal = heldRockmeal
     def PlayerInfo(self):
         print(f"{self.name}'s stats:")
-        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/30), Sp: {player.spd}")
+        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/30), At: {player.atk}, Sp: {player.spd}")
+    def LevelUp(self):
+        print("You leveled up !!")
+        self.atk += 0.5
+        self.spd += 0.5
+        self.evasionchance += 2
+        self.maxHp += 2
+        self.level += 1
+        self.xp = 0
 class Enemy():
     def __init__(self, name, hp, atk, spd, xp):
         self.display = "%"
@@ -66,6 +75,48 @@ class Item():
         self.display = "$"
         self.name = name
         self.atk = atk
+class Village():
+    def __init__(self, fednessLvl):
+        self.fednessLvl = fednessLvl
+        self.nextMileStone = 149
+    def CheckDialogue(self):
+        self.fednessLvl += player.heldRockmeal
+        if self.fednessLvl > self.nextMileStone:
+            self.fednessLvl = self.nextMileStone
+        player.heldRockmeal = 0
+        if self.fednessLvl <= 100:
+            print('"Awhile ago, the village was faced with tragidy..\n' \
+            'There was a flood that destroyed all of our sources of food and farm land"')
+            self.nextMileStone = 150
+        elif self.fednessLvl <= 150:
+            print('"Oh my, is that food?? Bless you, you might have staved over our hunger for now.."')
+            self.nextMileStone = 200
+        elif self.fednessLvl <= 200:
+            print('"I know it might feel wrong taking this food, but it is for the best."')
+            self.nextMileStone = 250
+        elif self.fednessLvl <= 250:
+            print('"I have heard other townspeople complain about the dungeon raids as well...\n' \
+            'The truth is, rockmeal is a neverending resource, but they choose to keep it all for themselves."')
+            self.nextMileStone = 300
+        elif self.fednessLvl <= 300:
+            pass
+            self.nextMileStone = 350
+        elif self.fednessLvl <= 350:
+            print('"Hahahaha !! We have too much food !! I believe our village is saved !!\n' \
+            '..you... must have killed so many..."')
+            self.nextMileStone = 400
+        elif self.fednessLvl <= 400:
+            print('"Ha..hah.. thats even more ! what could we possibly do with all of this food..?"')
+            self.nextMileStone = 450
+        elif self.fednessLvl <= 450:
+            print('"Why do you keep pillaging... we have enough, theres no need for any more..."')
+        if self.fednessLvl < 250:
+            print('"We have nothing else for you now, besides healing, please do your best"')
+        else:
+            print('"Take all the food you need, we have plenty now"')
+        player.hp = player.maxHp
+        print("You feel rested..")
+        print(f"Next milestone: {self.nextMileStone}, current village fedness points: {self.fednessLvl}")
 # Places
 #class Tile():
 #    def __init__(self, occupency: Union[Player, Enemy, SpecialTile, EmptyTile]):
@@ -89,7 +140,7 @@ class Hallway():
         for i in range(random.randrange(2, self.maxTiles)):
             if (random.randrange(1, 10) > 7): # Spawn an enemy ?
                 enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
-                enemyToSpawn.atk *= dmgMod
+                enemyToSpawn.hp *= dmgMod
                 self.tiles.append(enemyToSpawn)
                 self.tilesDisplay.append(enemyToSpawn.display)
             else:
@@ -129,13 +180,14 @@ def DisplayOptions():
     global curEnemy
     if (inDungeon == False):
         optionsList.append("e: enter dungeon")
+        optionsList.append("v: visit village")
     else:
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
         print(f"Currently in: {dungeons[curDungeon].name}, basement {curFloor+1}")
         print(*dungeons[curDungeon].floors[curFloor].tilesDisplay)
         optionsList.append("<: walk left")
         optionsList.append(">: walk right")
-    optionsList.append("i: inventory")
+    #optionsList.append("i: inventory")
     optionsList.append("p: player info")
     if (curEnemy != None):
         optionsList.append("e: enemy info")
@@ -165,8 +217,12 @@ def DisplayOptions():
             elif curEnemy != None:
                 curEnemy.EnemyInfo()
                 DisplayOptions()
-        case "i":
-            CheckInventory()
+        case "v":
+            if inDungeon == False:
+                village.CheckDialogue()
+                DisplayOptions()
+        #case "i":
+        #    CheckInventory()
         case "p":
             player.PlayerInfo()
             DisplayOptions()
@@ -206,15 +262,27 @@ def MoveRight():
 
     # Has to be staircase down, so take it
     else:
-        print("Entering next floor...")
         try:
             dungeons[curDungeon].floors[curFloor + 1]
         except:
-            print("you get the rock food !!") # maybe generate the amount based on how many tiles you passed
+            print("You reached the bottom and find rockmeal !")
+            foundRockmeal = 0
+            for i in range(len(dungeons[curDungeon].floors)):
+                foundRockmeal += len(dungeons[curDungeon].floors[i].tiles)
+            if curDungeon == 0:
+                foundRockmeal /= 2
+            elif curDungeon == 2:
+                foundRockmeal *= 2
+            print(f"You pickup {foundRockmeal} pieces !!")
+            if player.heldRockmeal > 0:
+                player.heldRockmeal *= 1.1
+                print("Something lucky happened because you were risky !!")
+            player.heldRockmeal += foundRockmeal
             curTile = 1
             curFloor = 0
             inDungeon = False
             DisplayOptions()
+        print("Entering next floor...")
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile + 1] = specialTiles[2].display
         curFloor += 1
         curTile = 1
@@ -239,12 +307,13 @@ def MoveLeft():
             print("Returning to last floor...")
             curTile = len(dungeons[curDungeon].floors[curFloor].tiles) - 1
         else:
-            print("you exited the dungeon") # maybe generate the amount based on how many tiles you passed
+            print("You exited the dungeon") # maybe generate the amount based on how many tiles you passed
             inDungeon = False
     DisplayOptions()
 
 def FightEnemy():
     global curEnemy
+    global curTile
     global inDungeon
     if curEnemy.spd > player.spd and curEnemy.hp > 0 and player.hp > 0:
         if(random.randrange(1, 100) > player.evasionchance):
@@ -264,8 +333,10 @@ def FightEnemy():
     elif player.hp > 0:
         EnemyDied()
     if player.hp <= 0: 
-        print("You died...")
-        print(f"Got carried away and lost FOOD_AMOUNT_HERE...")
+        print("Ran out of energy and fainted...")
+        print(f"Got carried away and lost {player.heldRockmeal} rockmeal...")
+        player.heldRockmeal = 0
+        curTile = 1
         inDungeon = False
         DisplayOptions()
 
@@ -276,12 +347,7 @@ def EnemyDied():
     global curEnemy
     player.xp += curEnemy.xp
     if player.xp >= 30:
-        print("You leveled up !!")
-        player.atk += 0.5
-        player.spd += 0.5
-        player.evasionchance += 2
-        player.maxHp += 2
-        player.xp = 0
+        player.LevelUp()
     print(f"You beat the {curEnemy.name} and gained {curEnemy.xp}xp !!")
     curEnemy = None
     dungeons[curDungeon].floors[curFloor].tiles[curTile+1] = specialTiles[2]
@@ -297,15 +363,16 @@ enemies.append(Enemy("ghost", 2, 2, 2, 5))
 dungeons: list[Dungeon] = []
 dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1, 8))
 dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 1.5,  12))
-dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 2, 16))
+dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 3, 16))
 
 specialTiles: list[SpecialTile] = []
 specialTiles.append(SpecialTile("=", True, False))
 specialTiles.append(SpecialTile("=", True, True))
 specialTiles.append(SpecialTile("-", False))
 
-player = Player(usrname, 0, 0, 5, 5, 1, 1, 1)
+player = Player(usrname, 1, 0, 5, 5, 1, 1, 1)
 curEnemy: Enemy = None
+village = Village(100)
 
 # main program, Start Game !
 
@@ -317,6 +384,3 @@ print("However, this isnt the first one you've seen, not even the second, but th
 print("In this world, the choice is yours, what is it you'd like to do?")
 
 DisplayOptions()
-
-# pieces of lore handed to you throughout the game
-#print("Awhile ago, the village faced tragidy with a flood that completely destroyed all sources of food and farm land")
