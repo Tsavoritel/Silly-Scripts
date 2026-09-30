@@ -4,19 +4,26 @@ from typing import Union
 import time
 
 usrname = input("Enter your name: ")
+age: int = 0
 usrSelection = ""
 items = []
 dungeoned = False
 
-# Age Check
-try:
-    age = int(input("...and your age? "))
-except:
-    print("Please input a whole number.")
-if age < 13:
-    print("You are a minor, and are not yet old enough to use this product")
-    print("Shutting down...")
-    exit
+curDungeon: int = 0
+curFloor: int = 0
+curTile: int = 1
+
+def AgeCheck():
+    global age
+    try:
+        age = int(input("...and your age? "))
+    except:
+        print("Please input a whole number.")
+    if age < 13:
+        print("You are a minor, and are not yet old enough to use this product")
+        print("Restarting...")
+        AgeCheck()
+AgeCheck()
 
 # Main Setup
 # Entities
@@ -46,7 +53,7 @@ class Item():
         self.display = "$"
         self.name = name
         self.atk = atk
-class EmptyTile():
+class EmptyTile(): # depricated
     def __init__(self):
         self.display = "-"
 
@@ -61,18 +68,20 @@ class Hallway():
         self.tilesDisplay: list[str] = []
     def BuildHallway(self):
         self.maxEnemies = len(self.tiles) - 2
-        self.tiles.append(SpecialTile(True, False))
         self.tilesDisplay.append("↑")
-        self.tilesDisplay.append(specialTiles[0].display) # this wants to be an object, do you need a class?
+        self.tiles.append(specialTiles[0]) # staircase up
+        self.tilesDisplay.append(specialTiles[0].display)
+        self.tiles.append(specialTiles[2]) # always make an empty space for player to spawn on
+        self.tilesDisplay.append(specialTiles[2].display)
         for i in range(random.randrange(2, 10)):
-            if (random.randrange(1, 10) > 7): # Should u spawn an enemy
+            if (random.randrange(1, 10) > 7): # Spawn an enemy ?
                 enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
                 self.tiles.append(enemyToSpawn)
                 self.tilesDisplay.append(enemyToSpawn.display)
             else:
-                self.tiles.append(EmptyTile)
+                self.tiles.append(specialTiles[2])
                 self.tilesDisplay.append(specialTiles[2].display)
-        self.tiles.append(SpecialTile(True, True))
+        self.tiles.append(specialTiles[1])
         self.tilesDisplay.append(specialTiles[1].display)
         self.tilesDisplay.append("↓")
 class Dungeon():
@@ -87,7 +96,7 @@ class Dungeon():
             hall = Hallway()
             hall.BuildHallway()
             self.floors.append(hall)
-            print(f"Bult hallway: {i}: {hall.tilesDisplay}")
+            #print(f"Bult hallway: {i}: {hall.tilesDisplay}") # tis for debugging
             i += 1
 
 
@@ -99,13 +108,16 @@ def PlayerInfo():
     print(f"You are {usrname} and are {age} years old.")
 def DisplayOptions():
     optionsList = []
-    curDungeon: int
-    curFloor: int = 0
     global dungeoned
+    global curDungeon
+    global curFloor
+    global curTile
     if (dungeoned == False):
         optionsList.append("e: enter dungeon")
     else:
-        print()
+        dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
+        print(f"Currently in: {dungeons[curDungeon].name}, basement {curFloor+1}")
+        print(*dungeons[curDungeon].floors[curFloor].tilesDisplay)
         optionsList.append("<: walk left")
         optionsList.append(">: walk right")
     optionsList.append("i: inventory")
@@ -115,11 +127,12 @@ def DisplayOptions():
     usrSelection = input("Input: ")
     match usrSelection:
         case "e":
+            if (dungeoned): DisplayOptions()
             print("Which dungeon would you like to explore ?")
             print(f"Options: 1: {dungeons[0].name}, 2: {dungeons[1].name}, 3: {dungeons[2].name}")
             try:
                 curDungeon = int(input("Input: "))
-            except:
+            except ValueError:
                 print("Invalid option")
                 DisplayOptions()
             if not(curDungeon in (1, 2, 3)):
@@ -129,8 +142,6 @@ def DisplayOptions():
             print(f"Entering {dungeons[curDungeon].name} ....")
             dungeons[curDungeon].BuildDungeon()
             time.sleep(1)
-            print(f"Currently in: {dungeons[curDungeon].name}.. On floor {curFloor}")
-            print(dungeons[curDungeon].floors[curFloor].tilesDisplay)
             dungeoned = True
             DisplayOptions()
         case "i":
@@ -140,7 +151,23 @@ def DisplayOptions():
         case "<":
             print("Walked one space left")
         case ">":
-            print("Walked one space right")
+            if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
+                print("Attacked an enemy !!")
+            elif dungeons[curDungeon].floors[curFloor].tiles[curTile+1] == specialTiles[2]:
+                print("Walked one space right")
+                curTile += 1
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
+                print(f"Current Tile: {curTile}")
+            else: #has to be staircase down
+                print("Entering next floor...")
+                if (dungeons[curDungeon].floors[curFloor + 1] == None):
+                    print("you get the rock food !!") # maybe generate the amount based on how many tiles you passed
+                else:
+                    curFloor += 1
+                    curTile = 1
+            DisplayOptions()
+
         case "x":
             print("Exiting...")
         case _:
@@ -162,6 +189,8 @@ specialTiles: list[SpecialTile] = []
 specialTiles.append(SpecialTile("=", True, False))
 specialTiles.append(SpecialTile("=", True, True))
 specialTiles.append(SpecialTile("-", False))
+
+player = Player(usrname, 0, 5, 1, 0)
 
 # main program (Start Game !)
 
