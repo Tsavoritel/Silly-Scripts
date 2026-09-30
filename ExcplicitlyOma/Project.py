@@ -152,7 +152,9 @@ class Hallway():
             if (random.randrange(1, 10) > 6): # Spawn an enemy ?
                 if curDungeon != 3:
                     enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
-                else: enemyToSpawn = villager
+                else:
+                    enemyToSpawn = villager
+                    print("what have you done...")
                 enemyToSpawn.hp *= dmgMod
                 self.tiles.append(enemyToSpawn)
                 self.tilesDisplay.append(enemyToSpawn.display)
