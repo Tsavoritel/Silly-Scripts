@@ -9,6 +9,8 @@ items = []
 
 inDungeon = False
 fighting = False
+showMoreOptions = False
+autoWalk = False
 
 curDungeon: int = 0
 curFloor: int = 0
@@ -80,9 +82,6 @@ class Enemy():
     def EnemyInfo(self):
         print(f"{self.name}'s stats:")
         print(f"Hp: {self.hp}, At: {self.atk}")
-    def SpawnEnemy(self):
-        
-        return self
 
 class Item():
     def __init__(self, name, atk):
@@ -202,11 +201,13 @@ def CheckInventory():
     DisplayOptions()
 def DisplayOptions():
     optionsList = []
+    global showMoreOptions
     global inDungeon
     global curDungeon
     global curFloor
     global curTile
     global curEnemy
+
     print("")
     if (inDungeon == False):
         optionsList.append("e: enter dungeon")
@@ -221,9 +222,15 @@ def DisplayOptions():
     optionsList.append("p: player info")
     if (curEnemy != None):
         optionsList.append("e: enemy info")
-    optionsList.append("x: exit game")
+    if (showMoreOptions == True):
+        optionsList.append("x: exit game")
+        optionsList.append("i: info")
+        optionsList.append("s: settings")
+    else: optionsList.append("m: more options")
+
     print(f"options: {optionsList}")
     usrSelection = input("Input: ")
+    showMoreOptions = False
     print("")
     print("+-------------------------------------------------+")
     match usrSelection:
@@ -258,10 +265,22 @@ def DisplayOptions():
         case "p":
             player.PlayerInfo()
             DisplayOptions()
-        case "<" | ",":
+        case "m":
+            showMoreOptions = True
+        case "i":
+            print("Controls:")
+            print("move leftward: < , a")
+            print("move rightward: > . d")
+            print("Tips:")
+            print("To attack an enemy, walk into it")
+            print("You can leave a dungeon by walking out of it")
+            print("Options are always available on context")
+        case "s":
+            Settings()
+        case "<" | "," | "a":
             if inDungeon:
                 MoveLeft()
-        case ">" | ".":
+        case ">" | "." | "d":
             if inDungeon:
                 MoveRight()
         case "x":
@@ -286,6 +305,11 @@ def MoveRight():
 
     # Move forward if nothing is in front of you
     elif dungeons[curDungeon].floors[curFloor].tiles[curTile+1] == specialTiles[2]:
+        while autoWalk and dungeons[curDungeon].floors[curFloor].tiles[curTile+2] == specialTiles[2]:
+            print("Walked one space right")
+            curTile += 1
+            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
+            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
         print("Walked one space right")
         curTile += 1
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
@@ -325,13 +349,20 @@ def MoveLeft():
     global curDungeon
     global curFloor
     global curTile
+    global curEnemy
+
     if dungeons[curDungeon].floors[curFloor].tiles[curTile - 1] == specialTiles[2]:
+        while autoWalk and dungeons[curDungeon].floors[curFloor].tiles[curTile - 2] == specialTiles[2]:
+            print("Walked one space left")
+            curTile += 1
+            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
+            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
+            curTile -= 2
         print("Walked one space left")
         curTile += 1
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
         curTile -= 2
-        #print(f"Current Tile: {curTile}")
     else: #has to be staircase up
         if (curFloor - 1 >= 0):
             curFloor -= 1
@@ -340,6 +371,7 @@ def MoveLeft():
             curTile = len(dungeons[curDungeon].floors[curFloor].tiles) - 2
         else:
             print("You exited the dungeon") # maybe generate the amount based on how many tiles you passed
+            curEnemy = None
             inDungeon = False
     DisplayOptions()
 
@@ -386,6 +418,17 @@ def EnemyDied():
     dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+2] = specialTiles[2].display
     DisplayOptions()
 
+def Settings():
+    global autoWalk
+    print(f"a: Toggle autowalk - {autoWalk}")
+    print(f"press anything else to exit")
+    si = input("Toggle setting: ")
+    match si:
+        case "a":
+            autoWalk = not autoWalk
+        case _:
+            DisplayOptions()
+
 # objects
 enemies = []
 enemies.append(Enemy("slime", 1, 0.5, 1, 1))
@@ -394,10 +437,10 @@ enemies.append(Enemy("ghost", 2, 2, 2, 5))
 villager = (Enemy("villager", 3, 3, 3, 10))
 
 dungeons: list[Dungeon] = []
-dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1, 8))
-dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 4,  12))
-dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 10, 16))
-dungeons.append(Dungeon("...Village.. what are you doing??", 10, 14, 32))
+dungeons.append(Dungeon("Moss Grotto (easy)", random.randrange(2, 3), 1, 8))
+dungeons.append(Dungeon("Withered Catacombs (tough)", random.randrange(3, 5), 4,  12))
+dungeons.append(Dungeon("Fiery Hollows (arduous)", random.randrange(4, 6), 10, 16))
+dungeons.append(Dungeon("...Village.. what are you doing?? (insane)", 10, 14, 32))
 
 specialTiles: list[SpecialTile] = []
 specialTiles.append(SpecialTile("=", True, False))
