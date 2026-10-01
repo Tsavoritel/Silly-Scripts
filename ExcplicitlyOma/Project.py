@@ -315,12 +315,13 @@ def MoveRight():
 
     # Move forward if nothing is in front of you
     elif dungeons[curDungeon].floors[curFloor].tiles[curTile+1] == specialTiles[2]:
+        i = 1
         while autoWalk and dungeons[curDungeon].floors[curFloor].tiles[curTile+2] == specialTiles[2]:
-            print("Walked one space right")
+            i += 1
             curTile += 1
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
-        print("Walked one space right")
+        print(f"Walked {i} space(s) right")
         curTile += 1
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
@@ -362,13 +363,14 @@ def MoveLeft():
     global curEnemy
 
     if dungeons[curDungeon].floors[curFloor].tiles[curTile - 1] == specialTiles[2]:
+        i = 1
         while autoWalk and dungeons[curDungeon].floors[curFloor].tiles[curTile - 2] == specialTiles[2]:
-            print("Walked one space left")
+            i += 1
             curTile += 1
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
             curTile -= 2
-        print("Walked one space left")
+        print(f"Walked {i} space(s) left")
         curTile += 1
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
