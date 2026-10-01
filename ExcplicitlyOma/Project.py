@@ -61,7 +61,7 @@ class Player():
         self.heldRockmeal = heldRockmeal
     def PlayerInfo(self):
         print(f"{self.name}'s stats:")
-        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/20), At: {self.atk}, Sp: {self.spd}, Hr: {self.heldRockmeal}")
+        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/20), At: {self.atk}, Sp: {self.spd}, Rf: {self.heldRockmeal}")
     def LevelUp(self):
         print("| +------------- You leveled up !! -------------+ |")
         self.atk += 0.5
@@ -251,10 +251,10 @@ def DisplayOptions():
         case "v":
             if inDungeon == False:
                 village.CheckDialogue()
-                DisplayOptions()
+                return
         case "p":
             player.PlayerInfo()
-            DisplayOptions()
+            return
         case "m":
             showMoreOptions = True
             DisplayOptions()
@@ -268,12 +268,15 @@ def DisplayOptions():
             print("Options are always available on context")
         case "s":
             Settings()
+            return
         case "<" | "," | "a":
             if inDungeon:
                 MoveLeft()
+                return
         case ">" | "." | "d":
             if inDungeon:
                 MoveRight()
+                return
         case "x":
             if village.fednessLvl > 200 and village.fednessLvl < 455:
                 print("You go back home to rest, with the rockmeal evergrowing, food will never be a concern for anyone agian.")
@@ -281,12 +284,13 @@ def DisplayOptions():
             quit()
         case "=":
             village.fednessLvl += 50
+            return
         case "+":
             player.LevelUp()
+            return
         case _:
             pass
     print("Invalid option, please choose from the following list")
-    DisplayOptions()
 
 def MoveRight():
     global inDungeon
@@ -339,7 +343,6 @@ def MoveRight():
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile + 1] = specialTiles[2].display
         curFloor += 1
         curTile = 1
-    DisplayOptions()
 
 def MoveLeft():
     global inDungeon
@@ -371,7 +374,6 @@ def MoveLeft():
             print("You exited the dungeon") # maybe generate the amount based on how many tiles you passed
             curEnemy = None
             inDungeon = False
-    DisplayOptions()
 
 def FightEnemy():
     global curEnemy
@@ -416,7 +418,6 @@ def EnemyDied():
     curEnemy = None
     dungeons[curDungeon].floors[curFloor].tiles[curTile+1] = specialTiles[2]
     dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+2] = specialTiles[2].display
-    DisplayOptions()
 
 def Settings():
     global autoWalk
@@ -427,7 +428,7 @@ def Settings():
         case "a":
             autoWalk = not autoWalk
         case _:
-            DisplayOptions()
+            pass
 
 # objects
 enemies = []
@@ -465,4 +466,5 @@ print("Along your travels, you notice entrences embedded in the ground, unsaitia
 print("However, this isnt the first one you've seen, not even the second, but the third !")
 print("In this world, the choice is yours, what is it you'd like to do?")
 
-DisplayOptions()
+while True:
+    DisplayOptions()
