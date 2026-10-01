@@ -1,6 +1,5 @@
 #mod01 excercise1, mod02 excercise2, and project 1-3
 import random
-from typing import Union
 import copy
 import time
 
@@ -82,12 +81,6 @@ class Enemy():
     def EnemyInfo(self):
         print(f"{self.name}'s stats:")
         print(f"Hp: {self.hp}, At: {self.atk}")
-
-class Item():
-    def __init__(self, name, atk):
-        self.display = "$"
-        self.name = name
-        self.atk = atk
 class Village():
     def __init__(self, fednessLvl):
         self.fednessLvl = fednessLvl
@@ -125,13 +118,17 @@ class Village():
             self.nextMileStone = 600
         elif self.fednessLvl >= 600 and self.fednessLvl < 1000:
             print('"Why do you keep pillaging... we have enough, theres no need for any more..."')
-            self.nextMileStone = 2000
-        elif self.fednessLvl >= 1000:
+            self.nextMileStone = 1000
+        elif self.fednessLvl >= 1000 and self.fednessLvl < 1500:
             curDungeon = 3
             print(f"Entering {dungeons[curDungeon].name} ....")
             dungeons[curDungeon].BuildDungeon()
             time.sleep(1)
             inDungeon = True
+            self.nextMileStone = 1500
+            DisplayOptions()
+        else:
+            print("Theres nothing here.")
             DisplayOptions()
         if self.fednessLvl < 200:
             print('"We have nothing else for you now, besides healing, please do your best"')
@@ -143,9 +140,6 @@ class Village():
         print("You feel rested..")
         print(f"Next milestone: {self.nextMileStone}, current village fedness points: {self.fednessLvl}")
 # Places
-#class Tile():
-#    def __init__(self, occupency: Union[Player, Enemy, SpecialTile, EmptyTile]):
-#        self.occupency = occupency
 class Hallway():
     def __init__(self):
         self.tiles: list = []
@@ -168,7 +162,7 @@ class Hallway():
                 if curDungeon != 3:
                     enemyToSpawn = copy.copy(enemies[random.randrange(0, len(enemies))]) # Which one
                 else:
-                    enemyToSpawn = villager
+                    enemyToSpawn = copy.copy(villager)
                     print("what have you done...")
                 enemyToSpawn.hp *= dungeons[curDungeon].damageMod
                 self.tiles.append(enemyToSpawn)
@@ -193,14 +187,7 @@ class Dungeon():
             hall = Hallway()
             hall.BuildHallway(self.maxTilesPerFloor)
             self.floors.append(hall)
-            #print(f"Bult hallway: {i}: {hall.tilesDisplay}") # tis for debugging
             i += 1
-
-def ItemAdder(item):
-    items.append(item)
-def CheckInventory():
-    print(items)
-    DisplayOptions()
 def DisplayOptions():
     optionsList = []
     global showMoreOptions
@@ -225,7 +212,7 @@ def DisplayOptions():
     if (curEnemy != None):
         optionsList.append("e: enemy info")
     if (showMoreOptions == True):
-        if village.fednessLvl > 200 and village.fednessLvl < 455:
+        if village.fednessLvl >= 200 and village.fednessLvl < 455:
             optionsList.append("x: complete objective")
         else:
             optionsList.append("x: exit game")
@@ -265,8 +252,6 @@ def DisplayOptions():
             if inDungeon == False:
                 village.CheckDialogue()
                 DisplayOptions()
-        #case "i":
-        #    CheckInventory()
         case "p":
             player.PlayerInfo()
             DisplayOptions()
@@ -290,6 +275,8 @@ def DisplayOptions():
             if inDungeon:
                 MoveRight()
         case "x":
+            if village.fednessLvl > 200 and village.fednessLvl < 455:
+                print("You go back home to rest, with the rockmeal evergrowing, food will never be a concern for anyone agian.")
             print("Exiting...")
             quit()
         case "=":
@@ -325,7 +312,6 @@ def MoveRight():
         curTile += 1
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
         dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
-        #print(f"Current Tile: {curTile}")
 
     # Has to be staircase down, so take it
     else:
@@ -473,7 +459,7 @@ if age > 120:
     print("Wow.. you're *really* old !")
     time.sleep(1)
 print("")
-print("You find yourself in a mysterious world of Goo")
+print("You find yourself in a mysterious world of Aequitas")
 print("Surrounded by vast fields and forests, remembering you were entrusted to save the village")
 print("Along your travels, you notice entrences embedded in the ground, unsaitiably curious, you are compelled inward")
 print("However, this isnt the first one you've seen, not even the second, but the third !")
