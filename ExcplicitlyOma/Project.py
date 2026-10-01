@@ -1,20 +1,28 @@
 #mod01 excercise1, mod02 excercise2, and project 1-3
 import random
 from typing import Union
+import copy
 import time
 
-usrname = input("Enter your name: ")
-age: int = 0
 usrSelection = ""
 items = []
 
 inDungeon = False
 fighting = False
 
-
 curDungeon: int = 0
 curFloor: int = 0
 curTile: int = 1
+
+usrname = ""
+age: int = 0
+
+def CheckUsrName():
+    global usrname
+    usrname = input("Enter your name: ")
+    if usrname == "":
+        print("Come on, give a real name")
+        CheckUsrName()
 
 def AgeCheck():
     global age
@@ -24,8 +32,10 @@ def AgeCheck():
         print("Please input a whole number.")
     if age < 13:
         print("You are a minor, and are not yet old enough to use this product")
-        print("Restarting...")
-        AgeCheck()
+        print("Exiting...")
+        quit()
+
+CheckUsrName()
 AgeCheck()
 
 # Main Setup
@@ -52,7 +62,7 @@ class Player():
         print(f"{self.name}'s stats:")
         print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/20), At: {self.atk}, Sp: {self.spd}, Hr: {self.heldRockmeal}")
     def LevelUp(self):
-        print("You leveled up !!")
+        print("| +------------- You leveled up !! -------------+ |")
         self.atk += 0.5
         self.spd += 0.5
         self.evasionchance += 2
@@ -70,6 +80,10 @@ class Enemy():
     def EnemyInfo(self):
         print(f"{self.name}'s stats:")
         print(f"Hp: {self.hp}, At: {self.atk}")
+    def SpawnEnemy(self):
+        
+        return self
+
 class Item():
     def __init__(self, name, atk):
         self.display = "$"
@@ -136,11 +150,9 @@ class Hallway():
         self.tiles: list = []
         self.maxEnemies: int
         self.maxTiles: int
-        self.dmgMod: float = 1
         self.tilesDisplay: list[str] = []
-    def BuildHallway(self, maxTiles, dmgMod):
+    def BuildHallway(self, maxTiles):
         self.maxTiles = maxTiles
-        self.dmgMod = dmgMod
         self.maxEnemies = len(self.tiles) - 2
         self.tilesDisplay.append("↑")
         self.tiles.append(specialTiles[0]) # staircase up
@@ -150,12 +162,14 @@ class Hallway():
 
         for i in range(random.randrange(2, self.maxTiles)):
             if (random.randrange(1, 10) > 6): # Spawn an enemy ?
+                #enemyToSpawn: Enemy
+                #enemyToSpawn.hp = 0
                 if curDungeon != 3:
-                    enemyToSpawn: Enemy = enemies[random.randrange(0, len(enemies))] # Which one
+                    enemyToSpawn = copy.copy(enemies[random.randrange(0, len(enemies))]) # Which one
                 else:
                     enemyToSpawn = villager
                     print("what have you done...")
-                enemyToSpawn.hp *= dmgMod
+                enemyToSpawn.hp *= dungeons[curDungeon].damageMod
                 self.tiles.append(enemyToSpawn)
                 self.tilesDisplay.append(enemyToSpawn.display)
             else:
@@ -176,7 +190,7 @@ class Dungeon():
         i = 0
         for hall in range(self.maxFloors):
             hall = Hallway()
-            hall.BuildHallway(self.maxTilesPerFloor, self.damageMod)
+            hall.BuildHallway(self.maxTilesPerFloor)
             self.floors.append(hall)
             #print(f"Bult hallway: {i}: {hall.tilesDisplay}") # tis for debugging
             i += 1
@@ -211,7 +225,7 @@ def DisplayOptions():
     print(f"options: {optionsList}")
     usrSelection = input("Input: ")
     print("")
-    print("+-----------------------------------------+")
+    print("+-------------------------------------------------+")
     match usrSelection:
         case "e":
             if inDungeon == False:
@@ -226,6 +240,7 @@ def DisplayOptions():
                     print("Invalid option")
                     DisplayOptions()
                 curDungeon -= 1
+                curTile = 1
                 print(f"Entering {dungeons[curDungeon].name} ....")
                 dungeons[curDungeon].BuildDungeon()
                 time.sleep(1)
@@ -263,9 +278,6 @@ def MoveRight():
     global curFloor
     global curTile
     global curEnemy
-
-    try: dungeons[curDungeon].floors[curFloor].tiles[curTile + 1]
-    except: return
 
     # Fight enemy if its in front of you
     if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
@@ -399,10 +411,11 @@ village = Village(100)
 # main program, Start Game !rest
 
 print(f"Hello {usrname}, age {age} !")
-if age > 120: 
+if age > 120:
     time.sleep(1)
     print("Wow.. you're *really* old !")
     time.sleep(1)
+print("")
 print("You find yourself in a mysterious world of Goo")
 print("Surrounded by vast fields and forests, remembering you were entrusted to save the village")
 print("Along your travels, you notice entrences embedded in the ground, unsaitiably curious, you are compelled inward")
