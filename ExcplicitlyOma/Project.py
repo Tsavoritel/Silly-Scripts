@@ -69,7 +69,7 @@ class Enemy():
         self.xp = xp
     def EnemyInfo(self):
         print(f"{self.name}'s stats:")
-        print(f"Hp: {self.hp}")
+        print(f"Hp: {self.hp}, At: {self.atk}")
 class Item():
     def __init__(self, name, atk):
         self.display = "$"
@@ -193,6 +193,7 @@ def DisplayOptions():
     global curFloor
     global curTile
     global curEnemy
+    print("")
     if (inDungeon == False):
         optionsList.append("e: enter dungeon")
         optionsList.append("v: visit village")
@@ -209,6 +210,7 @@ def DisplayOptions():
     optionsList.append("x: exit game")
     print(f"options: {optionsList}")
     usrSelection = input("Input: ")
+    print("")
     print("+-----------------------------------------+")
     match usrSelection:
         case "e":
@@ -241,10 +243,10 @@ def DisplayOptions():
         case "p":
             player.PlayerInfo()
             DisplayOptions()
-        case "<":
+        case "<" | ",":
             if inDungeon:
                 MoveLeft()
-        case ">":
+        case ">" | ".":
             if inDungeon:
                 MoveRight()
         case "x":
@@ -261,6 +263,9 @@ def MoveRight():
     global curFloor
     global curTile
     global curEnemy
+
+    try: dungeons[curDungeon].floors[curFloor].tiles[curTile + 1]
+    except: return
 
     # Fight enemy if its in front of you
     if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
@@ -320,7 +325,7 @@ def MoveLeft():
             curFloor -= 1
             curTile -= 1
             print("Returning to last floor...")
-            curTile = len(dungeons[curDungeon].floors[curFloor].tiles) - 1
+            curTile = len(dungeons[curDungeon].floors[curFloor].tiles) - 2
         else:
             print("You exited the dungeon") # maybe generate the amount based on how many tiles you passed
             inDungeon = False
@@ -347,7 +352,7 @@ def FightEnemy():
             EnemyDied()
     elif player.hp > 0:
         EnemyDied()
-    if player.hp <= 0: 
+    if player.hp <= 0:
         print("Ran out of energy and fainted...")
         print(f"Got carried away and lost {player.heldRockmeal} rockmeal...")
         player.heldRockmeal = 0
@@ -371,16 +376,16 @@ def EnemyDied():
 
 # objects
 enemies = []
-enemies.append(Enemy("slime", 1, 0, 1, 1))
+enemies.append(Enemy("slime", 1, 0.5, 1, 1))
 enemies.append(Enemy("skeleton", 1.5, 1, 1, 2))
 enemies.append(Enemy("ghost", 2, 2, 2, 5))
 villager = (Enemy("villager", 3, 3, 3, 10))
 
 dungeons: list[Dungeon] = []
 dungeons.append(Dungeon("Moss Grotto", random.randrange(2, 3), 1, 8))
-dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 3,  12))
-dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 8, 16))
-dungeons.append(Dungeon("...Village.. what are you doing??", 10, 20, 32))
+dungeons.append(Dungeon("Withered Catacombs", random.randrange(3, 5), 4,  12))
+dungeons.append(Dungeon("Fiery Hollows", random.randrange(4, 6), 10, 16))
+dungeons.append(Dungeon("...Village.. what are you doing??", 10, 14, 32))
 
 specialTiles: list[SpecialTile] = []
 specialTiles.append(SpecialTile("=", True, False))
