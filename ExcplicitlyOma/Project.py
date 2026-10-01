@@ -133,10 +133,12 @@ class Village():
             time.sleep(1)
             inDungeon = True
             DisplayOptions()
-        if self.fednessLvl < 300:
+        if self.fednessLvl < 200:
             print('"We have nothing else for you now, besides healing, please do your best"')
-        elif self.fednessLvl < 1000:
+        elif self.fednessLvl < 600:
             print('"Take all the food you need, we have plenty now"')
+        else:
+            print("...")
         player.hp = player.maxHp
         print("You feel rested..")
         print(f"Next milestone: {self.nextMileStone}, current village fedness points: {self.fednessLvl}")
@@ -223,7 +225,10 @@ def DisplayOptions():
     if (curEnemy != None):
         optionsList.append("e: enemy info")
     if (showMoreOptions == True):
-        optionsList.append("x: exit game")
+        if village.fednessLvl > 200 and village.fednessLvl < 455:
+            optionsList.append("x: complete game")
+        else:
+            optionsList.append("x: exit game")
         optionsList.append("i: info")
         optionsList.append("s: settings")
     else: optionsList.append("m: more options")
