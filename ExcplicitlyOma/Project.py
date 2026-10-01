@@ -226,7 +226,7 @@ def DisplayOptions():
         optionsList.append("e: enemy info")
     if (showMoreOptions == True):
         if village.fednessLvl > 200 and village.fednessLvl < 455:
-            optionsList.append("x: complete game")
+            optionsList.append("x: complete objective")
         else:
             optionsList.append("x: exit game")
         optionsList.append("i: info")
