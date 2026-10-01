@@ -99,34 +99,34 @@ class Village():
         if self.fednessLvl > self.nextMileStone:
             self.fednessLvl = self.nextMileStone
         player.heldRockmeal = 0
-        if self.fednessLvl <= 100:
+        if self.fednessLvl >= 50:
             print('"Awhile ago, the village was faced with tragidy..\n' \
             'There was a flood that destroyed all of our sources of food and farm land"')
-            self.nextMileStone = 120
-        elif self.fednessLvl <= 120:
+            self.nextMileStone = 100
+        elif self.fednessLvl >= 100:
             print('"Oh my, is that food?? Bless you, you might have staved over our hunger for now.."')
-            self.nextMileStone = 150
-        elif self.fednessLvl <= 150:
+            self.nextMileStone = 120
+        elif self.fednessLvl >= 120:
             print('"I know it might feel wrong taking this food, but it is for the best."')
-            self.nextMileStone = 200
-        elif self.fednessLvl <= 200:
+            self.nextMileStone = 150
+        elif self.fednessLvl >= 150:
             print('"I have heard other townspeople complain about the dungeon raids as well...\n' \
             'The truth is, rockmeal is a neverending resource, but they choose to keep it all for themselves."')
-            self.nextMileStone = 300
-        elif self.fednessLvl <= 300:
+            self.nextMileStone = 200
+        elif self.fednessLvl >= 200:
             pass
-            self.nextMileStone = 455
-        elif self.fednessLvl <= 455:
+            self.nextMileStone = 300
+        elif self.fednessLvl >= 300:
             print('"Hahahaha !! We have too much food !! I believe our village is saved !!\n' \
             '..you... must have killed so many..."')
-            self.nextMileStone = 600
-        elif self.fednessLvl <= 600:
+            self.nextMileStone = 455
+        elif self.fednessLvl >= 455:
             print('"Ha..hah.. thats even more ! What could we.. possibly.. do with all of this food..?"')
-            self.nextMileStone = 1000
-        elif self.fednessLvl < 1000:
+            self.nextMileStone = 600
+        elif self.fednessLvl >= 600:
             print('"Why do you keep pillaging... we have enough, theres no need for any more..."')
-            self.nextMileStone = 1500
-        elif self.fednessLvl == 1500:
+            self.nextMileStone >= 1000
+        elif self.fednessLvl == 1000:
             curDungeon = 3
             print(f"Entering {dungeons[curDungeon].name} ....")
             dungeons[curDungeon].BuildDungeon()
@@ -135,7 +135,7 @@ class Village():
             DisplayOptions()
         if self.fednessLvl < 300:
             print('"We have nothing else for you now, besides healing, please do your best"')
-        elif self.fednessLvl < 1500:
+        elif self.fednessLvl < 1000:
             print('"Take all the food you need, we have plenty now"')
         player.hp = player.maxHp
         print("You feel rested..")
@@ -449,7 +449,7 @@ specialTiles.append(SpecialTile("-", False))
 
 player = Player(usrname, 1, 0, 5, 5, 1, 1, 1)
 curEnemy: Enemy = None
-village = Village(100)
+village = Village(60)
 
 # main program, Start Game !rest
 
