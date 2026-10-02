@@ -61,7 +61,7 @@ class Player():
         self.heldRockmeal = heldRockmeal
     def PlayerInfo(self):
         print(f"{self.name}'s stats:")
-        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/20), At: {self.atk}, Sp: {self.spd}, Rf: {self.heldRockmeal}")
+        print(f"Hp: {self.hp}, Lv: {self.level} (xp:{self.xp}/20), At: {self.atk}, Sp: {self.spd}, Rm: {self.heldRockmeal}")
     def LevelUp(self):
         print("| +------------- You leveled up !! -------------+ |")
         self.atk += 0.5
@@ -126,10 +126,10 @@ class Village():
             time.sleep(1)
             inDungeon = True
             self.nextMileStone = 1500
-            DisplayOptions()
+            return
         else:
             print("Theres nothing here.")
-            DisplayOptions()
+            return
         if self.fednessLvl < 200:
             print('"We have nothing else for you now, besides healing, please do your best"')
         elif self.fednessLvl < 600:
@@ -207,7 +207,6 @@ def DisplayOptions():
         print(*dungeons[curDungeon].floors[curFloor].tilesDisplay)
         optionsList.append("<: walk left")
         optionsList.append(">: walk right")
-    #optionsList.append("i: inventory")
     optionsList.append("p: player info")
     if (curEnemy != None):
         optionsList.append("e: enemy info")
@@ -234,10 +233,10 @@ def DisplayOptions():
                     curDungeon = int(input("Input: "))
                 except ValueError:
                     print("Invalid option")
-                    DisplayOptions()
+                    return
                 if not(curDungeon in (1, 2, 3)):
                     print("Invalid option")
-                    DisplayOptions()
+                    return
                 curDungeon -= 1
                 curTile = 1
                 curFloor = 0
@@ -245,10 +244,8 @@ def DisplayOptions():
                 dungeons[curDungeon].BuildDungeon()
                 time.sleep(1)
                 inDungeon = True
-                DisplayOptions()
             elif curEnemy != None:
                 curEnemy.EnemyInfo()
-                DisplayOptions()
         case "v":
             if inDungeon == False:
                 village.CheckDialogue()
@@ -257,7 +254,6 @@ def DisplayOptions():
             player.PlayerInfo()
         case "m":
             showMoreOptions = True
-            DisplayOptions()
         case "i":
             print("Controls:")
             print("move leftward: < , a")
@@ -297,45 +293,45 @@ def MoveRight():
     dcf = dungeons[curDungeon].floors[curFloor].tiles
 
     # Move forward if nothing is in front of you
-    if dcf[curTile+1] == specialTiles[2]:
-        i = 1
-        while dcf[curTile+1] == specialTiles[2]:
-            i += 1
-            curTile += 1
-            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
-            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
-            if autoWalk != True:
-                break
-        print(f"Walked {i} space(s) right")
+    if type(dcf[curTile+1]) == SpecialTile:
+        if dcf[curTile+1].isStaircase == False:
+            i = 0
+            while dcf[curTile+1].isStaircase == False:
+                i += 1
+                curTile += 1
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
+                dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
+                if autoWalk == False or type(dcf[curTile+1]) != SpecialTile or dcf[curTile+1].isStaircase == True:
+                    break
+            print(f"Walked {i} space(s) right")
+        # Take staircase down if a staircase is in front of you
+        elif dcf[curTile+1].isStaircase == True:
+            try:
+                dungeons[curDungeon].floors[curFloor + 1]
+            except:
+                print("You reached the bottom and find rockmeal !")
+                foundRockmeal = 0
+                for i in range(len(dungeons[curDungeon].floors)):
+                    foundRockmeal += len(dungeons[curDungeon].floors[i].tiles)
+                if curDungeon == 0:
+                    foundRockmeal //= 2
+                elif curDungeon == 2:
+                    foundRockmeal *= 2
+                print(f"You pickup {foundRockmeal} pieces !!")
+                if player.heldRockmeal > 0:
+                    player.heldRockmeal = round(player.heldRockmeal * 1.1, None)
+                    print("Something lucky happened because you were risky !!")
+                player.heldRockmeal += foundRockmeal
+                inDungeon = False
+                return
+            print("Entering next floor...")
+            dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile + 1] = specialTiles[2].display
+            curFloor += 1
+            curTile = 1
     # Fight enemy if its in front of you
     elif type(dcf[curTile+1]) == Enemy:
         curEnemy = dcf[curTile+1]
         FightEnemy()
-        return
-    # Take staircase down if a staircase is in front of you
-    elif dcf[curTile+1] == specialTiles[1]:
-        try:
-            dungeons[curDungeon].floors[curFloor + 1]
-        except:
-            print("You reached the bottom and find rockmeal !")
-            foundRockmeal = 0
-            for i in range(len(dungeons[curDungeon].floors)):
-                foundRockmeal += len(dungeons[curDungeon].floors[i].tiles)
-            if curDungeon == 0:
-                foundRockmeal //= 2
-            elif curDungeon == 2:
-                foundRockmeal *= 2
-            print(f"You pickup {foundRockmeal} pieces !!")
-            if player.heldRockmeal > 0:
-                player.heldRockmeal = round(player.heldRockmeal * 1.1, None)
-                print("Something lucky happened because you were risky !!")
-            player.heldRockmeal += foundRockmeal
-            inDungeon = False
-            DisplayOptions()
-        print("Entering next floor...")
-        dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile + 1] = specialTiles[2].display
-        curFloor += 1
-        curTile = 1
 
 def MoveLeft():
     global inDungeon
@@ -345,7 +341,8 @@ def MoveLeft():
     global curEnemy
     dcf = dungeons[curDungeon].floors[curFloor].tiles
 
-    if dcf[curTile - 1] == specialTiles[2]:
+    if type(dcf[curTile - 1]) != SpecialTile: return
+    if dcf[curTile - 1].isStaircase == False:
         i = 1
         while dcf[curTile - 1] == specialTiles[2]:
             i += 1
@@ -356,7 +353,7 @@ def MoveLeft():
             if autoWalk == False:
                 break
         print(f"Walked {i} space(s) left")
-    elif dcf[curTile-1] == specialTiles[0]:
+    elif dcf[curTile-1].isStaircase == True:
         if (curFloor - 1 >= 0):
             curFloor -= 1
             curTile -= 1
@@ -396,7 +393,6 @@ def FightEnemy():
         curTile = 1
         curFloor = 0
         inDungeon = False
-        DisplayOptions()
 
 def EnemyDied():
     global curDungeon
