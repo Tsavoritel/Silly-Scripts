@@ -240,6 +240,7 @@ def DisplayOptions():
                     DisplayOptions()
                 curDungeon -= 1
                 curTile = 1
+                curFloor = 0
                 print(f"Entering {dungeons[curDungeon].name} ....")
                 dungeons[curDungeon].BuildDungeon()
                 time.sleep(1)
@@ -251,10 +252,9 @@ def DisplayOptions():
         case "v":
             if inDungeon == False:
                 village.CheckDialogue()
-                return
+            else: print("Invalid option, please choose from the following list")
         case "p":
             player.PlayerInfo()
-            return
         case "m":
             showMoreOptions = True
             DisplayOptions()
@@ -268,15 +268,14 @@ def DisplayOptions():
             print("Options are always available on context")
         case "s":
             Settings()
-            return
         case "<" | "," | "a":
             if inDungeon:
                 MoveLeft()
-                return
+            else: print("Invalid option, please choose from the following list")
         case ">" | "." | "d":
             if inDungeon:
                 MoveRight()
-                return
+            else: print("Invalid option, please choose from the following list")
         case "x":
             if village.fednessLvl > 200 and village.fednessLvl < 455:
                 print("You go back home to rest, with the rockmeal evergrowing, food will never be a concern for anyone agian.")
@@ -284,13 +283,10 @@ def DisplayOptions():
             quit()
         case "=":
             village.fednessLvl += 50
-            return
         case "+":
             player.LevelUp()
-            return
         case _:
-            pass
-    print("Invalid option, please choose from the following list")
+            print("Invalid option, please choose from the following list")
 
 def MoveRight():
     global inDungeon
@@ -298,27 +294,26 @@ def MoveRight():
     global curFloor
     global curTile
     global curEnemy
-
-    # Fight enemy if its in front of you
-    if type(dungeons[curDungeon].floors[curFloor].tiles[curTile+1]) == Enemy:
-        curEnemy = dungeons[curDungeon].floors[curFloor].tiles[curTile+1]
-        FightEnemy()
+    dcf = dungeons[curDungeon].floors[curFloor].tiles
 
     # Move forward if nothing is in front of you
-    elif dungeons[curDungeon].floors[curFloor].tiles[curTile+1] == specialTiles[2]:
+    if dcf[curTile+1] == specialTiles[2]:
         i = 1
-        while autoWalk and dungeons[curDungeon].floors[curFloor].tiles[curTile+2] == specialTiles[2]:
+        while dcf[curTile+1] == specialTiles[2]:
             i += 1
             curTile += 1
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
+            if autoWalk != True:
+                break
         print(f"Walked {i} space(s) right")
-        curTile += 1
-        dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
-        dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile+1] = player.display
-
-    # Has to be staircase down, so take it
-    else:
+    # Fight enemy if its in front of you
+    elif type(dcf[curTile+1]) == Enemy:
+        curEnemy = dcf[curTile+1]
+        FightEnemy()
+        return
+    # Take staircase down if a staircase is in front of you
+    elif dcf[curTile+1] == specialTiles[1]:
         try:
             dungeons[curDungeon].floors[curFloor + 1]
         except:
@@ -335,8 +330,6 @@ def MoveRight():
                 player.heldRockmeal = round(player.heldRockmeal * 1.1, None)
                 print("Something lucky happened because you were risky !!")
             player.heldRockmeal += foundRockmeal
-            curTile = 1
-            curFloor = 0
             inDungeon = False
             DisplayOptions()
         print("Entering next floor...")
@@ -350,21 +343,20 @@ def MoveLeft():
     global curFloor
     global curTile
     global curEnemy
+    dcf = dungeons[curDungeon].floors[curFloor].tiles
 
-    if dungeons[curDungeon].floors[curFloor].tiles[curTile - 1] == specialTiles[2]:
+    if dcf[curTile - 1] == specialTiles[2]:
         i = 1
-        while autoWalk and dungeons[curDungeon].floors[curFloor].tiles[curTile - 2] == specialTiles[2]:
+        while dcf[curTile - 1] == specialTiles[2]:
             i += 1
             curTile += 1
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
             dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
             curTile -= 2
+            if autoWalk == False:
+                break
         print(f"Walked {i} space(s) left")
-        curTile += 1
-        dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile - 1] = player.display
-        dungeons[curDungeon].floors[curFloor].tilesDisplay[curTile] = specialTiles[2].display
-        curTile -= 2
-    else: #has to be staircase up
+    elif dcf[curTile-1] == specialTiles[0]:
         if (curFloor - 1 >= 0):
             curFloor -= 1
             curTile -= 1
