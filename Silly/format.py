@@ -10,5 +10,6 @@ print("+-------------------------------------------------+")
 print("| +------------- You leveled up !! -------------+ |")
 
 for i in range(100):
-    color = f"\033[0;{i}m"
-    print(f"{color}rainbowssss{resetC}" + f" this is color {i}")
+    if i not in range(48, 90) and i not in range(10, 21) and i not in range(22, 30):
+        color = f"\033[0;{i}m"
+        print(f"{color}rainbowssss{resetC}" + f" this is color {i}")
