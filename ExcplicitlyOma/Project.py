@@ -41,7 +41,7 @@ AgeCheck()
 
 # Main Setup
 # Entities
-class SpecialTile():
+class SpecialTile(): #Tile is a piece of a hallway
     def __init__(self, display, isStaircase: bool, down: bool = False):
         self.display = display
         self.isStaircase = isStaircase
@@ -81,7 +81,8 @@ class Enemy():
     def EnemyInfo(self):
         print(f"{self.name}'s stats:")
         print(f"Hp: {self.hp}, At: {self.atk}")
-class Village():
+
+class Village(): # Village dialogue and stats
     def __init__(self, fednessLvl):
         self.fednessLvl = fednessLvl
         self.nextMileStone = 100
@@ -147,6 +148,8 @@ class Hallway():
         self.maxTiles: int
         self.tilesDisplay: list[str] = []
     def BuildHallway(self, maxTiles):
+        # within each hallway, there are always two staircases..
+        # and an empty space after the first staircase for the player to spawn in
         self.maxTiles = maxTiles
         self.maxEnemies = len(self.tiles) - 2
         self.tilesDisplay.append("↑")
@@ -157,8 +160,6 @@ class Hallway():
 
         for i in range(random.randrange(2, self.maxTiles)):
             if (random.randrange(1, 10) > 6): # Spawn an enemy ?
-                #enemyToSpawn: Enemy
-                #enemyToSpawn.hp = 0
                 if curDungeon != 3:
                     enemyToSpawn = copy.copy(enemies[random.randrange(0, len(enemies))]) # Which one
                 else:
@@ -173,6 +174,7 @@ class Hallway():
         self.tiles.append(specialTiles[1])
         self.tilesDisplay.append(specialTiles[1].display)
         self.tilesDisplay.append("↓")
+
 class Dungeon():
     def __init__(self, name, maxFloors, damageMod, maxTilesPerFloor = 10):
         self.name = name
@@ -180,7 +182,7 @@ class Dungeon():
         self.damageMod = damageMod
         self.floors: list[Hallway] = []
         self.maxTilesPerFloor = maxTilesPerFloor
-    def BuildDungeon(self):
+    def BuildDungeon(self): # for each floor a dungeon should have, generate a hallway
         self.floors.clear()
         i = 0
         for hall in range(self.maxFloors):
@@ -197,6 +199,7 @@ def DisplayOptions():
     global curTile
     global curEnemy
 
+    # Build options list based on players situation
     print("")
     if (inDungeon == False):
         optionsList.append("e: enter dungeon")
@@ -219,6 +222,7 @@ def DisplayOptions():
         optionsList.append("s: settings")
     else: optionsList.append("m: more options")
 
+    # Give options and handle input
     print(f"options: {optionsList}")
     usrSelection = input("Input: ")
     showMoreOptions = False
@@ -333,7 +337,7 @@ def MoveRight():
         curEnemy = dcf[curTile+1]
         FightEnemy()
 
-def MoveLeft():
+def MoveLeft(): # follows the same logic as moving right, just with going back and up if needed
     global inDungeon
     global curDungeon
     global curFloor
@@ -369,6 +373,8 @@ def FightEnemy():
     global curTile
     global curFloor
     global inDungeon
+
+    # checks player stats against theirs and follows with damage on both sides
     if curEnemy.spd > player.spd and curEnemy.hp > 0 and player.hp > 0:
         if(random.randrange(1, 100) > player.evasionchance):
             player.hp -= curEnemy.atk
