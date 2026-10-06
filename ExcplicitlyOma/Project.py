@@ -231,6 +231,8 @@ def DisplayOptions():
     match usrSelection:
         case "e":
             if inDungeon == False:
+                # this means a user is not in a dungeon, and would like to be in one
+                # so lets go ahead and ask for which one and generate it
                 print("Which dungeon would you like to explore ?")
                 print(f"Options: 1: {dungeons[0].name}, 2: {dungeons[1].name}, 3: {dungeons[2].name}")
                 try:
@@ -424,7 +426,7 @@ def Settings():
         case _:
             pass
 
-# objects
+# Create needed objects
 enemies = []
 enemies.append(Enemy("slime", 1, 0.5, 1, 1))
 enemies.append(Enemy("skeleton", 1.5, 1, 1, 2))
@@ -446,7 +448,7 @@ player = Player(usrname, 1, 0, 5, 5, 1, 1, 1)
 curEnemy: Enemy = None
 village = Village(60)
 
-# main program, Start Game !rest
+# main program
 
 print(f"Hello {usrname}, age {age} !")
 if age > 120:
