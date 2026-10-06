@@ -1,4 +1,4 @@
-#mod01 excercise1, mod02 excercise2, and project 1-3
+#mod01 excercise1, mod02 excercise2, project 1-4, and final project
 import random
 import copy
 import time
@@ -148,8 +148,7 @@ class Hallway():
         self.maxTiles: int
         self.tilesDisplay: list[str] = []
     def BuildHallway(self, maxTiles):
-        # within each hallway, there are always two staircases..
-        # and an empty space after the first staircase for the player to spawn in
+        # within each hallway there are some static tiles, and random between enemies and empty tiles
         self.maxTiles = maxTiles
         self.maxEnemies = len(self.tiles) - 2
         self.tilesDisplay.append("↑")
@@ -168,10 +167,10 @@ class Hallway():
                 enemyToSpawn.hp *= dungeons[curDungeon].damageMod
                 self.tiles.append(enemyToSpawn)
                 self.tilesDisplay.append(enemyToSpawn.display)
-            else:
+            else: # place an empty tile
                 self.tiles.append(specialTiles[2])
                 self.tilesDisplay.append(specialTiles[2].display)
-        self.tiles.append(specialTiles[1])
+        self.tiles.append(specialTiles[1]) # staircase down
         self.tilesDisplay.append(specialTiles[1].display)
         self.tilesDisplay.append("↓")
 
@@ -314,7 +313,7 @@ def MoveRight():
         elif dcf[curTile+1].isStaircase == True:
             try:
                 dungeons[curDungeon].floors[curFloor + 1]
-            except:
+            except: # if this is the bottom floor, then teleport back to the top and award rockmeal
                 print("You reached the bottom and find rockmeal !")
                 foundRockmeal = 0
                 for i in range(len(dungeons[curDungeon].floors)):
@@ -339,7 +338,7 @@ def MoveRight():
         curEnemy = dcf[curTile+1]
         FightEnemy()
 
-def MoveLeft(): # follows the same logic as moving right, just with going back and up if needed
+def MoveLeft(): # follows the same logic as moving right, just with going back and up as needed
     global inDungeon
     global curDungeon
     global curFloor
