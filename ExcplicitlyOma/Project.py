@@ -18,6 +18,9 @@ curTile: int = 1
 usrname = ""
 age: int = 0
 
+colorY = "\033[0;93m"
+colorR = "\033[0;72m"
+
 def CheckUsrName():
     global usrname
     usrname = input("Enter your name: ")
@@ -48,7 +51,7 @@ class SpecialTile(): #Tile is a piece of a hallway
         self.down = down
 class Player():
     def __init__(self, name, level, xp, hp, maxHp, spd, atk, evasionchance, heldRockmeal = 0):
-        self.display = "☺︎"
+        self.display = f"{colorY}☺︎{colorR}"
         self.inventory = []
         self.name = name
         self.level = level
@@ -348,7 +351,7 @@ def MoveLeft(): # follows the same logic as moving right, just with going back a
 
     if type(dcf[curTile - 1]) != SpecialTile: return
     if dcf[curTile - 1].isStaircase == False:
-        i = 1
+        i = 0
         while dcf[curTile - 1] == specialTiles[2]:
             i += 1
             curTile += 1
@@ -445,7 +448,7 @@ specialTiles.append(SpecialTile("-", False))
 
 player = Player(usrname, 1, 0, 5, 5, 1, 1, 1)
 curEnemy: Enemy = None
-village = Village(60)
+village = Village(85)
 
 # main program
 
