@@ -1,8 +1,7 @@
 Name: Elise Collins
 
 Course progression (Python1):
-Completed: Mod01-Mod10, Project1-4, and final game
-Working on: Mod11 and Project 5
+Completed: Mod01-Mod13, Project1-5, and final game
 
 Project Documentation
 The goal of the game is to feed a village that is short on food by stealing it from greedy monsters. The idea is to find a balance in keeping the village fed.
