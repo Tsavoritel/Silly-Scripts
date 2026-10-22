@@ -1,23 +1,32 @@
-Products
-Plasma - DE and a suit system apps, theming, window management, etc
-KDE Connect
-Krita, K-stars, and other tools for professional and hobbyists use cases
+----Products----
+    Plasma - DE and a suit system apps, theming, window management, etc
+    KDE Connect
+    Krita, K-stars, and other tools for professional and hobbyists use cases
 
-Adoption
-Valve (proton, steamos)
+----Adoption----
+    Valve
+        proton, steamos
 
-netherlands has been taking some leaps towards digital sovereignty
-    theyre developing their own linux distro
-    and rolling out rules to administration use open source documents like .odt
+    netherlands has been taking some leaps towards digital sovereignty
+        theyre developing their own linux distro
+        and rolling out rules to administration use open source documents like .odt
 
-CERN
-    laboratory for particle physics
-    apparently uses linux for some applications
-    couldnt find much more information
-    speaks to it being a reliable option when push comes to shove
+    CERN
+        laboratory for particle physics
+        apparently uses linux for some applications
+        couldnt find much more information
+        speaks to it being a reliable option when push comes to shove
 
-Partnerships
+----Partnerships----
+    both partners here are considered an official patron or supporting member
+    means they provide money to KDE, often in turn for some benefit for themselves
+    for example, canonical blah blah blah
 
 
-Oppertunities
+----Oppertunities----
+    KDE is an amazing digital place for learning​ (WHY?)
 
+    explain how its growing in the industry​
+    Massive community for help and resources for learning the ins and outs of every avenue of KDE there is
+        (marketing, coding, web-dev, wiki writing, Q/A, design, etc)​
+    Mentoring Programs with Google Summer of Code and Season of KDE​
