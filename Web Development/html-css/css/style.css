@@ -35,17 +35,19 @@ ul {
 li {
   list-style-type: none;
 }
-main img {
-    border-radius: 4rem;
+.main {
     padding: 2rem;
-    max-width: 60rem;
+    width: 500rem;
+    height: 40rem;
+    object-fit: cover;
+    border-radius: 4rem;
 }
 header img {
     width: 4rem;
 }
 products img {
-    width: 200px;
-    height: 250px;
+    width: 16rem;
+    height: 16rem;
     object-fit: cover;
     border-radius: 1rem;
 }
@@ -61,6 +63,10 @@ p {
 }
 div {
     margin: -1rem 1.5rem;
+}
+figcaption {
+    color: #00000077;
+    font-size: small;
 }
 
 products {
