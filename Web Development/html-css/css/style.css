@@ -65,7 +65,7 @@ div {
     margin: -1rem 1.5rem;
 }
 figcaption {
-    color: #00000077;
+    color: #812522df;
     font-size: small;
 }
 
@@ -75,7 +75,7 @@ products {
     min-width: 0;
     display: grid;
     grid-template-columns: auto auto auto;
-    padding: 2rem 6rem;
+    padding: 3rem 6rem;
     
 }
 products div {
