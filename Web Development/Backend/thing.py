@@ -12,18 +12,27 @@ def serve_home():
 
 @app.route("/plus")
 def calculate_sum():
-    arguments = request.args
-    print(arguments)
-    number1 = float(arguments.get("number1"))
-    number2 = float(arguments.get("number2"))
+    try:
+        arguments = request.args
+        print(arguments)
+        number1 = float(arguments.get("number1"))
+        number2 = float(arguments.get("number2"))
 
-    responce_data = {
-        "number1": number1,
-        "number2": number2,
-        "result": number1 + number2
-    }
+        response_data = {
+            "number1": number1,
+            "number2": number2,
+            "result": number1 + number2
+        }
 
-    return responce_data
+        return response_data
+    except ValueError:
+        response = {
+            "message": "Argument(s) not a number",
+            "status": 400
+        }
+        json_response = json.dumps(response)
+        http_response = Response(response = json_response, status = 400, mimetype = "applications/json")
+        return http_response
 
 #error handler
 @app.errorhandler(404)
